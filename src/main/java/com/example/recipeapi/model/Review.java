@@ -21,7 +21,7 @@ public class Review {
 
     @ManyToOne(optional = false)
     @JoinColumn
-    //@JsonIgnore
+    @JsonIgnore
     private CustomUserDetails user;
 
     @NotNull(message = "You must include a rating with your review.")
@@ -40,7 +40,7 @@ public class Review {
         this.rating = rating;
     }
 
-    public String getAuthor() {
-        return user.getUsername();
-    }
+//    public String getAuthor() {
+//        return user.getUsername();
+//    }
 }

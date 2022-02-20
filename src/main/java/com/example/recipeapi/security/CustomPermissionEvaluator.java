@@ -69,7 +69,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 }
 
                 //if the author of the entity matches the current user they are the owner of the recipe and should be allowed access
-                return recipe.get().getAuthor().equals(userDetails.getUsername());
+                return recipe.get().getUser().getUsername().equals(userDetails.getUsername());
 
             } else if (targetType.equalsIgnoreCase("review")) {
                 Optional<Review> review = reviewRepo.findById(Long.parseLong(targetId.toString()));
@@ -78,7 +78,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 }
 
                 //if the author of the entity matches the current user they are the owner of the review and should be allowed access
-                return review.get().getAuthor().equals(userDetails.getUsername());
+                return review.get().getUser().getUsername().equals(userDetails.getUsername());
             }
         }
         return true;

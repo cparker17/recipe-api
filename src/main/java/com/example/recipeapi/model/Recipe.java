@@ -42,7 +42,7 @@ public class Recipe {
 
     @ManyToOne(optional = false)
     @JoinColumn
-    //@JsonIgnore
+    @JsonIgnore
     private CustomUserDetails user;
 
     @NotNull(message = "You must include at least one ingredient.")
@@ -119,7 +119,7 @@ public class Recipe {
         reviews.add(review);
     }
 
-    public String getAuthor() {
-        return user.getUsername();
-    }
+//    public String getAuthor() {
+//        return user.getUsername();
+//    }
 }
