@@ -5,15 +5,17 @@ import com.example.recipeapi.model.Recipe;
 import com.example.recipeapi.services.CustomUserDetailsService;
 import com.example.recipeapi.services.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/recipes")
@@ -23,6 +25,9 @@ public class RecipeController {
 
     @Autowired
     RecipeService recipeService;
+
+    @Autowired
+    CacheManager cacheManager;
 
     @PostMapping
     public ResponseEntity<?> createNewRecipe(@RequestBody Recipe recipe, Principal principal) {
@@ -78,6 +83,7 @@ public class RecipeController {
 
     @PatchMapping
     @PreAuthorize("hasPermission(#updatedRecipe.id, 'Recipe', 'edit')")
+    @CachePut(value="recipeCache", key="#updatedRecipe.id")
     public ResponseEntity<?> updateRecipe(@RequestBody Recipe updatedRecipe) {
         try {
             Recipe returnedUpdatedRecipe = recipeService.updateRecipe(updatedRecipe);
@@ -88,11 +94,13 @@ public class RecipeController {
     }
 
     @GetMapping ("/search/name/{name}")
-    Recipe getRecipeByName(@PathVariable("name") String name) {
+    @Cacheable(value = "recipeListCache", key = "#name", sync = true)
+    public Recipe getRecipeByName(@PathVariable("name") String name) {
         return recipeService.getRecipeByName(name);
     }
 
     @GetMapping("/search/average_rating/{rating}")
+    @Cacheable(value = "recipeListCache", key = "#averageReviewRating", sync = true)
     public  ResponseEntity<?> getRecipeByMinimumAverageRating(@PathVariable("rating") Integer averageReviewRating) {
         try {
             return ResponseEntity.ok(recipeService.getRecipesByMinimumRAverageRating(averageReviewRating));
@@ -102,6 +110,7 @@ public class RecipeController {
     }
 
     @GetMapping("/search/rating/{rating}")
+    @Cacheable(value = "recipeListCache", key = "#rating", sync = true)
     public ResponseEntity<?> getRecipesByRating(@PathVariable("rating") Integer rating) {
         try {
             return ResponseEntity.ok("The recipes with a rating of " + rating + " are: " +
@@ -112,6 +121,7 @@ public class RecipeController {
     }
 
     @GetMapping("/search/username/{username}")
+    @Cacheable(value = "recipeListCatch", key = "#username", sync = true)
     public ResponseEntity<?> getRecipesByUsername(@PathVariable("username") String username) {
         try {
             return ResponseEntity.ok("Here are the recipes submitted by " + username + ": " +

@@ -2,22 +2,22 @@ package com.example.recipeapi.services;
 
 import com.example.recipeapi.exceptions.NoSuchRecipeException;
 import com.example.recipeapi.model.Recipe;
-import com.example.recipeapi.model.Review;
 import com.example.recipeapi.repositories.RecipeRepo;
-import com.example.recipeapi.repositories.ReviewRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RecipeService {
     @Autowired
     RecipeRepo recipeRepo;
+
+    @Autowired
+    CacheManager cacheManager;
 
     @Transactional
     public Recipe createNewRecipe(Recipe recipe) throws IllegalStateException {
@@ -27,6 +27,7 @@ public class RecipeService {
         return recipe;
     }
 
+    @Cacheable(value = "recipeCache", key = "#id", sync = true)
     public Recipe getRecipeById(Long id) throws NoSuchRecipeException {
         Optional<Recipe> recipeOptional = recipeRepo.findById(id);
 
@@ -39,6 +40,7 @@ public class RecipeService {
         return recipe;
     }
 
+    @Cacheable(value = "recipeListCache", key = "#name", sync = true)
     public ArrayList<Recipe> getRecipesByName(String name) throws NoSuchRecipeException {
         ArrayList<Recipe> matchingRecipes = recipeRepo.findByNameContaining(name);
 
@@ -52,6 +54,7 @@ public class RecipeService {
         return matchingRecipes;
     }
 
+    @Cacheable(value = "recipeListCache", key = "#name", sync = true)
     public ArrayList<Recipe> getAllRecipes() throws NoSuchRecipeException {
         ArrayList<Recipe> recipes = new ArrayList<>(recipeRepo.findAll());
 
@@ -62,6 +65,7 @@ public class RecipeService {
     }
 
     @Transactional
+    @CacheEvict(value = "recipeCache", allEntries = true)
     public Recipe deleteRecipeById(Long id) throws NoSuchRecipeException {
         try {
             Recipe recipe = getRecipeById(id);

@@ -1,12 +1,12 @@
 package com.example.recipeapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 @Entity
 @Getter
@@ -40,7 +40,7 @@ public class CustomUserDetails implements UserDetails {
     @Column(nullable = false)
     private boolean isEnabled = true;
 
-    public CustomUserDetails(String username, String password, Collection<Role> authorities, UserMeta userMeta) {
+    public CustomUserDetails(String username, String password, Set<Role> authorities, UserMeta userMeta) {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
@@ -52,7 +52,7 @@ public class CustomUserDetails implements UserDetails {
             name = "userId",
             nullable = false
     )
-    private Collection<Role> authorities = new ArrayList<>();
+    private Set<Role> authorities = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.PERSIST, optional = false)
     private UserMeta userMeta;

@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity
 @Getter
@@ -12,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Review {
+public class Review implements Serializable {
 
     @Id
     @GeneratedValue
@@ -29,6 +30,8 @@ public class Review {
 
     @NotNull(message = "Please leave a description for your review.")
     private String description;
+
+    private static final long serialVersionUID = 3963834437381589543L;
 
     public void setRating(Integer rating) {
         if (rating == null) {

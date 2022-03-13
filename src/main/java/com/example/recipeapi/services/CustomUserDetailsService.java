@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
+import java.util.HashSet;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -55,7 +56,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         customUserDetails.setAccountNonLocked(true);
         customUserDetails.setCredentialsNonExpired(true);
         customUserDetails.setEnabled(true);
-        customUserDetails.setAuthorities(Collections.singletonList(new Role(Role.Roles.ROLE_USER)));
+        customUserDetails.setAuthorities(new HashSet<Role>(Collections.singleton(new Role(Role.Roles.ROLE_USER))));
         
         checkPassword(customUserDetails.getPassword());
         customUserDetails.setPassword(encoder.encode(customUserDetails.getPassword()));

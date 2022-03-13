@@ -6,6 +6,9 @@ import com.example.recipeapi.model.Recipe;
 import com.example.recipeapi.model.Review;
 import com.example.recipeapi.repositories.ReviewRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ public class ReviewService {
     @Autowired
     RecipeService recipeService;
 
+    @Cacheable(value = "reviewCache", key = "#id", sync = true)
     public Review getReviewById(Long id) throws NoSuchReviewException {
         Optional<Review> review = reviewRepo.findById(id);
 
@@ -28,6 +32,7 @@ public class ReviewService {
         return review.get();
     }
 
+    @Cacheable(value = "reviewCache", key = "#recipeId", sync = true)
     public ArrayList<Review> getReviewByRecipeId(Long recipeId) throws NoSuchRecipeException, NoSuchReviewException {
         Recipe recipe = recipeService.getRecipeById(recipeId);
 
@@ -39,6 +44,7 @@ public class ReviewService {
         return reviews;
     }
 
+    @Cacheable(value = "reviewListCache", key = "#username", sync = true)
     public ArrayList<Review> getReviewByUsername(String username) throws NoSuchReviewException {
         ArrayList<Review> reviews = reviewRepo.findByUser_Username(username);
 
@@ -60,6 +66,7 @@ public class ReviewService {
         }
     }
 
+    @CacheEvict(value = "reviewCache", allEntries = true)
     public Review deleteReviewById(Long id) throws NoSuchReviewException {
         Review review = getReviewById(id);
 
@@ -70,6 +77,7 @@ public class ReviewService {
         return review;
     }
 
+    @CachePut(value="reviewCache", key="#reviewToUpdate.id")
     public Review updateReviewById(Review reviewToUpdate) throws NoSuchReviewException {
         try {
             getReviewById(reviewToUpdate.getId());

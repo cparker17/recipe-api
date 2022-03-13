@@ -7,10 +7,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 @Entity
 @Getter
@@ -19,11 +19,13 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Recipe {
+public class Recipe implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private static final long serialVersionUID = -3767875814558613671L;
 
     @NotNull(message = "You must give a name for your recipe.")
     @Column(nullable = false)
@@ -41,7 +43,6 @@ public class Recipe {
     private Integer averageReviewRating;
 
     @ManyToOne(optional = false)
-    @JoinColumn
     @JsonIgnore
     private CustomUserDetails user;
 
@@ -57,7 +58,7 @@ public class Recipe {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(nullable = false)
-    private Collection<Review> reviews;
+    private Set<Review> reviews;
 
     @Transient
     @JsonIgnore
@@ -91,20 +92,20 @@ public class Recipe {
     }
 
     public void setAverageReviewRating() {
-        int sum = 0;
-        int count = 0;
-
-        if (reviews != null) {
-            for (Review review : reviews) {
-                sum += review.getRating();
-                count++;
-            }
-            if (count == 0) {
-                averageReviewRating = 0;
-            } else {
-                averageReviewRating = sum/count;
-            }
-        }
+//        int sum = 0;
+//        int count = 0;
+//
+//        if (reviews != null) {
+//            for (Review review : reviews) {
+//                sum += review.getRating();
+//                count++;
+//            }
+//            if (count == 0) {
+//                averageReviewRating = 0;
+//            } else {
+//                averageReviewRating = sum/count;
+//            }
+//        }
     }
 
     public Integer getAverageReviewRating() {
@@ -114,7 +115,7 @@ public class Recipe {
 
     public void addReview(Review review) {
         if (reviews == null) {
-            reviews = new ArrayList<>();
+            reviews = new HashSet<>();
         }
         reviews.add(review);
     }

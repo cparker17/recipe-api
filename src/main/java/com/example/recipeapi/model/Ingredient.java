@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity
 @Getter
@@ -14,11 +15,13 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ingredient {
+public class Ingredient implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
+
+    private static final long serialVersionUID = 6098697371161055563L;
 
     @NotNull
     private String name;
